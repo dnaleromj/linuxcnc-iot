@@ -1,0 +1,60 @@
+#!/usr/bin/python
+
+import hal, time
+import datetime
+import os.path
+import urllib2
+
+####### Initialize
+COMPNAME = "iot"
+DELAY=10
+ADAFRUIT_IO_KEY =  open(os.path.expanduser('~/.adafruit_io_key'), 'r').read().replace('\n', '')
+ADAFRUIT_IO_URL="https://io.adafruit.com/api/groups/tormachpcnc1100/send.json?x-aio-key=" + ADAFRUIT_IO_KEY
+
+
+h = hal.component(COMPNAME)
+isRunning = h.newpin("is-running", hal.HAL_BIT, hal.HAL_IN)
+isPaused = h.newpin("is-paused", hal.HAL_BIT, hal.HAL_IN)
+isIdle = h.newpin("is-idle", hal.HAL_BIT, hal.HAL_IN)
+isToolNumber = h.newpin("tool-number", hal.HAL_U32, hal.HAL_IN)
+isTimeHoures = h.newpin("time-hours", hal.HAL_U32, hal.HAL_IN)
+isTimeSeconds = h.newpin("time-seconds", hal.HAL_U32, hal.HAL_IN)
+isTimeMinutes = h.newpin("time-minutes", hal.HAL_U32, hal.HAL_IN)
+
+tempOut = h.newpin("tempout", hal.HAL_BIT, hal.HAL_OUT)
+h.ready() 
+
+previousRunState = not h['is-running']
+
+########
+try:
+  while True:
+#    print(("iot loop started"))
+#    print(("          prs: " + str(previousRunState)))
+#    print(("   is running: " + str(h['is-running'])))
+#    print(("      is idle: " + str(h['is-idle'])))
+#    print(("   time hours: " + str(h['time-hours'])))
+#    print((" time seconds: " + str(h['time-seconds'])))
+#    print((" time minutes: " + str(h['time-minutes'])))
+#    aio = Client(ADAFRUIT_IO_KEY)
+    if previousRunState != h['is-running']:
+        if not previousRunState:
+           u = urllib2.urlopen(ADAFRUIT_IO_URL+ "&running=TRUE&msg=Tormach%20is%20running")
+           u.getcode()
+        else:
+           u = urllib2.urlopen(ADAFRUIT_IO_URL+ "&running=FALSE&msg=Tormach%20is%20not%20running")
+           u.getcode()
+           
+
+#       aio.send('pcnc1100-jcm', 
+#                'Tormach started at {0} '
+#                .format(datetime.datetime.now().strftime("%H:%M:%S %Z")) )
+
+    previousRunState = h['is-running']
+    time.sleep(DELAY)
+#    print(("iot loop finished"))
+except Exception as e:
+  print e
+  print(("Exiting HAL component"))
+  h.exit()
+

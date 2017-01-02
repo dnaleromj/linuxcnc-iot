@@ -1,0 +1,1 @@
+halcmd unload iot
