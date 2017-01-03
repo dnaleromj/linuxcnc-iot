@@ -7,7 +7,7 @@ import urllib2
 
 ####### Initialize
 COMPNAME = "iot"
-DELAY=10
+DELAY=60
 ADAFRUIT_IO_KEY =  open(os.path.expanduser('~/.adafruit_io_key'), 'r').read().replace('\n', '')
 ADAFRUIT_IO_URL="https://io.adafruit.com/api/groups/tormachpcnc1100/send.json?x-aio-key=" + ADAFRUIT_IO_KEY
 
